@@ -1,54 +1,53 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: dmitry-mac
- * Date: 4/3/19
- * Time: 1:33 AM
- */
 
 class Board {
 
 	private $blocks;
 	private $zeroX;
 	private $zeroY;
-	private $h;
+	private $heuristic;
 	private $g;
 	private $final;
 
 	public function __construct($array, $final) {
+		global $HEURISTIC_FUNC_FLAG;
+
 		$tmp = $array;
 		$this->blocks = $tmp;
-		$this->h = 0;
+		$this->heuristic = 0;
 		$this->g = 0;
 		$this->final = $final;
-		global $heruistic;
 
+		$this->fillBoard($array, $final);
+	}
+
+	private function fillBoard($array, $final) {
 		foreach ($array as $key => $value) {
 			foreach ($value as $k => $v) {
 				if ($v != ($this->final[$key][$k])) {
-					$this->h += abs($this->getXY($final, $v, 'x') - $key) + abs($this->getXY($final, $v, 'y') - $k);
+					$this->heuristic += abs($this->getXY($final, $v, 'x') - $key) + abs($this->getXY($final, $v, 'y') - $k);
 				} if ($v == 0) {
 					$this->zeroX = (int)$key;
 					$this->zeroY = (int)$k;
 				}
 			}
-			if ($heruistic == "-lc")
-                $this->h += $this->LinearConflict($value, $key);
+			if ($HEURISTIC_FUNC_FLAG == "-lc")
+								$this->heuristic += $this->linearConflict($value, $key);
 		}
-		if ($heruistic == "-wp") {
-		    $this->h = 0;
-            foreach ($array as $key => $value) {
-                foreach ($value as $k =>$v)
-                    if ($v != $final[$key][$k])
-                        $this->h++;
-		    }
-        }
+		if ($HEURISTIC_FUNC_FLAG == "-wp") {
+				$this->heuristic = 0;
+						foreach ($array as $key => $value) {
+								foreach ($value as $k =>$v)
+										if ($v != $final[$key][$k])
+												$this->heuristic++;
+				}
+		}
 	}
 
-	private function LinearConflict($row, $numRow) {
+	private function linearConflict($row, $numRow) {
 		$n = 0;
 		foreach ($row as $key => $value)
-			for ($k = $key; $k < $this->dimension(); $k++)
+			for ($k = $key; $k < $this->getDimencion(); $k++)
 				if (!$this->checkOrder($value, $row[$k], $key, $k, $numRow))
 					$n += 1;
 		return $n;
@@ -84,7 +83,7 @@ class Board {
 		}
 	}
 
-	public function dimension() {
+	public function getDimencion() {
 		return count($this->blocks);
 	}
 
@@ -101,15 +100,15 @@ class Board {
 		}
 	}
 
-	public function isGoal() {
-		return $this->h == 0;
+	public function amOnPlace() {
+		return $this->heuristic != 0;
 	}
 
 	public function equals(Board $o) {
 		if ($this == $o)
 			return true;
 
-		if ($o->dimension() != $this->dimension())
+		if ($o->getDimencion() != $this->getDimencion())
 			return false;
 
 		foreach ($o as $key => $value) {
@@ -121,19 +120,19 @@ class Board {
 		return true;
 	}
 
-	public function neighbors() {
+	public function findNeighbors() {
 
 		$brds = array();
-		array_push($brds, $this->chng($this->blocks, $this->zeroX, $this->zeroY, $this->zeroX, $this->zeroY + 1));
-		array_push($brds, $this->chng($this->blocks, $this->zeroX, $this->zeroY, $this->zeroX, $this->zeroY - 1));
-		array_push($brds, $this->chng($this->blocks, $this->zeroX, $this->zeroY, $this->zeroX - 1, $this->zeroY));
-		array_push($brds, $this->chng($this->blocks, $this->zeroX, $this->zeroY, $this->zeroX + 1, $this->zeroY));
+		array_push($brds, $this->makeChange($this->blocks, $this->zeroX, $this->zeroY, $this->zeroX, $this->zeroY + 1));
+		array_push($brds, $this->makeChange($this->blocks, $this->zeroX, $this->zeroY, $this->zeroX, $this->zeroY - 1));
+		array_push($brds, $this->makeChange($this->blocks, $this->zeroX, $this->zeroY, $this->zeroX - 1, $this->zeroY));
+		array_push($brds, $this->makeChange($this->blocks, $this->zeroX, $this->zeroY, $this->zeroX + 1, $this->zeroY));
 
 		return $brds;
 	}
 
-	private function chng($board, $x1, $y1, $x2, $y2) {
-		if ($x2 > -1 && $x2 < $this->dimension() && $y2 > -1 && $y2 < $this->dimension()) {
+	private function makeChange($board, $x1, $y1, $x2, $y2) {
+		if ($x2 > -1 && $x2 < $this->getDimencion() && $y2 > -1 && $y2 < $this->getDimencion()) {
 			$t = $board[$x2][$y2];
 			$board[$x2][$y2] = $board[$x1][$y1];
 			$board[$x1][$y1] = $t;
@@ -142,15 +141,6 @@ class Board {
 		} else
 			return null;
 	}
-
-
-	public function toString() {
-		foreach ($this->blocks as $key => $value) {
-			foreach ($value as $k => $v) {
-				print "$v ";
-			}
-			print "\n";
-		}
-	}
-
 }
+
+?>

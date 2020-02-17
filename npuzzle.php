@@ -7,7 +7,7 @@ require_once "Solver.php";
 
 function readFromFile($filename){
 	$file = file($filename);
-	if (!$file) error_handler(2); 
+	if (!$file) error_handler(2);
 
 	$map = [];
 	$stringMap = [];
@@ -18,12 +18,12 @@ function readFromFile($filename){
 		}
 		$string = trim(preg_replace('/\#.*/i', '', preg_replace('/\s+/', ' ', trim($string))));
 		$data = explode(' ', $string);
-		
+
 		if (count($data)) {
 			$digitsCount = count($data);
 		}
 		if ($digitsCount == 1 && $data[0]) {
-			$map_size = $data[0]; 
+			$map_size = $data[0];
 			continue;
 		}
 
@@ -121,7 +121,7 @@ function	findWay($map_size, $map) {
 		$sideCnt++;
 		$gpCnt++;
 
-		if ($sideCnt == 5) 
+		if ($sideCnt == 5)
 			$sideCnt = 1;
 		if ($side == -1)
 			break;
@@ -149,21 +149,20 @@ function newWay($map_size, $way){
 }
 
 function    error_handler($num = 0) {
-    $msg = "
-to execute this program use:
-php npuzzle.php -md map.txt
-
-Heuristic available modes:
-	-lc (linear conflict)
-	-md (manhattan distanse)
-	-b (both of them)";
+  $msg = "
+ 		to execute this program use:
+		php npuzzle.php -md map.txt
+		Heuristic available modes:
+		-lc (linear conflict)
+		-md (manhattan distanse)
+		-b (both of them)";
 
 	if ($num == 1){
         error_log("\nWrong count of argument");
 	} elseif ($num == 2){
-        error_log("\nfile does't exist");
+        error_log("\nFile does't exist");
 	} elseif ($num == 3){
-        error_log("\ninvalid map");
+        error_log("\nInvalid map");
     	exit(1);
 	} elseif ($num == 4){
 		error_log("This puzzle is unsolvable!");
@@ -177,7 +176,7 @@ function main($argc, $argv){
 	validate($argc);
 	$data = readFromFile($argv[2]);
 	solveExist($data['map']);
-	$heruistic = $argv[1];
+	$HEURISTIC_FUNC_FLAG = $argv[1];
 	$newWay = newWay($data["map_size"], findWay($data["map_size"], $data["map"]));
 	// error_log(print_r($newWay ,1));
     $board = new Board($data['map'], $newWay);

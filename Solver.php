@@ -1,38 +1,25 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: dmitry-mac
- * Date: 4/3/19
- * Time: 1:34 AM
- */
 
-class Queue extends SplPriorityQueue {
-
-	public function compare($p1, $p2) {
-		if ($p1 === $p2) return 0;
-		return $p1 > $p2 ? -1 : 1;
-	}
-}
+require "Queue.php";
 
 class Solver {
 	private $initial;
 
 	function __construct($initial) {
 		$this->initial = $initial;
-
 	}
 
 	function printBoard($board) {
 		foreach ($board as $key => $item) {
 			foreach ($item as $val) {
 			    if ($val == 0)
-	    			print "\33[91m" . $val . "\33[0m";
+	    			print "\33[90m" . $val . "\33[0m";
 			    else
-			        print "\33[34m" . $val . "\33[0m";
-				if ($val > 9)
-				    print " ";
-				else
+			        print "\33[35m" . $val . "\33[0m";
+				if ($val < 10)
 				    print "  ";
+				else
+				    print " ";
 			}
 			print " \n";
 		}
@@ -71,19 +58,19 @@ class Solver {
 			array_push($close, $priorityQueue->top()->current()->blocks);
 			$current = $priorityQueue->top();
 			$list = $priorityQueue->extract();
-			if ($list->current()->isGoal()) {
+			if (!$list->current()->amOnPlace()) {
 			    $count = $list->count();
 				while (!$list->isEmpty()) {
 					$this->printBoard($list->pop()->blocks);
 					print "\n";
 				}
-                print "need move to win - " . $count . "\n";
-                print "complexity in time - " . $complexityInTime . "\n";
-				print "complexity in size - " . ($complexityInTime - $count) . "\n";
+        print "Moves need to win - " . $count . "\n";
+        print "Complexity in time - " . $complexityInTime . "\n";
+				print "Complexity in size - " . ($complexityInTime - $count) . "\n";
 				return ($list);
 			}
 
-			$iterrator = $list->current()->neighbors();
+			$iterrator = $list->current()->findNeighbors();
 
 			foreach ($iterrator as $key => $value) {
 				if ($value != null) {
@@ -118,8 +105,10 @@ class Solver {
 
 	function measure(Board $obj) {
 		$c = $obj->g;
-		$measure = $obj->h;
+		$measure = $obj->heuristic;
 
 		return $c + $measure;
 	}
 }
+
+?>

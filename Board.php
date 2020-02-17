@@ -8,14 +8,15 @@ class Board {
 	private $heuristic;
 	private $g;
 	private $final;
+	private $zero;
 
 	public function __construct($array, $final) {
 		global $HEURISTIC_FUNC_FLAG;
 
-		$tmp = $array;
-		$this->blocks = $tmp;
-		$this->heuristic = 0;
-		$this->g = 0;
+		$this->zero = 0 ;
+		$this->blocks = $array;
+		$this->heuristic = $this->zero;
+		$this->g = $this->zero;
 		$this->final = $final;
 
 		$this->fillBoard($array, $final);
@@ -47,7 +48,7 @@ class Board {
 	private function linearConflict($row, $numRow) {
 		$n = 0;
 		foreach ($row as $key => $value)
-			for ($k = $key; $k < $this->getDimencion(); $k++)
+			for ($k = $key; $k < count($this->blocks); $k++)
 				if (!$this->checkOrder($value, $row[$k], $key, $k, $numRow))
 					$n += 1;
 		return $n;
@@ -83,10 +84,6 @@ class Board {
 		}
 	}
 
-	public function getDimencion() {
-		return count($this->blocks);
-	}
-
 	public function __get($name) {
 		if (property_exists($this, $name)) {
 			return $this->$name;
@@ -108,7 +105,7 @@ class Board {
 		if ($this == $o)
 			return true;
 
-		if ($o->getDimencion() != $this->getDimencion())
+		if (count($o->blocks) != count($this->blocks))
 			return false;
 
 		foreach ($o as $key => $value) {
@@ -132,7 +129,7 @@ class Board {
 	}
 
 	private function makeChange($board, $x1, $y1, $x2, $y2) {
-		if ($x2 > -1 && $x2 < $this->getDimencion() && $y2 > -1 && $y2 < $this->getDimencion()) {
+		if ($x2 > -1 && $x2 < count($this->blocks) && $y2 > -1 && $y2 < count($this->blocks)) {
 			$t = $board[$x2][$y2];
 			$board[$x2][$y2] = $board[$x1][$y1];
 			$board[$x1][$y1] = $t;

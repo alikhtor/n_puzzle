@@ -183,6 +183,7 @@ function main($argc, $argv){
 
     $solution = new Solver($board);
     $test = $solution->solve();
+		// error_log(print_r($test ,1));
 }
 
 main($argc, $argv);

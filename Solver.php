@@ -4,12 +4,65 @@ require "Queue.php";
 
 class Solver {
 	private $initial;
+	private $priorityQueue;
+	private $close;
+	private $list;
+	private $complexityInTime;
+	private $zero = 0;
 
 	function __construct($initial) {
 		$this->initial = $initial;
+
+		$this->priorityQueue = new Queue();
+		$this->close = array();
+		$this->list = new splDoublyLinkedList();
+		$this->complexityInTime = $this->zero;
 	}
 
-	function printBoard($board) {
+	public function solve() {
+		$this->list->unshift($this->initial);
+		$this->list->rewind();
+		$this->priorityQueue->insert($this->list, 1000000);
+		return $this->createResultArray();
+	}
+
+	private function createResultArray() {
+		while (true) {
+			array_push($this->close, $this->priorityQueue->top()->current()->blocks);
+			$current = $this->priorityQueue->top();
+			$this->list = $this->priorityQueue->extract();
+			if (!$this->list->current()->amOnPlace()) {
+					$count = $this->list->count();
+				while (!$this->list->isEmpty()) {
+					$this->printBoard($this->list->pop()->blocks);
+					print "\n";
+				}
+				print "Moves need to win - " . $count . "\n";
+				print "Complexity in time - " . $this->complexityInTime . "\n";
+				print "Complexity in size - " . ($this->complexityInTime - $count) . "\n";
+				return ($this->list);
+			}
+
+			$iterrator = $this->list->current()->findNeighbors();
+
+			foreach ($iterrator as $key => $value) {
+				if ($value != null) {
+					if (array_search($value->blocks, $this->close) == false) {
+						$new = new splDoublyLinkedList();
+						$new->unshift($value);
+						$new = $this->copyList2($new, $current);
+						$new->rewind();
+						$new->current()->g += 1;
+						$this->priorityQueue->insert($new, $new->current()->g + $new->current()->heuristic);
+							$this->complexityInTime++;
+					}
+				}
+			}
+		}
+		return $this->priorityQueue->top();
+	}
+
+	private function printBoard($board) {
 		foreach ($board as $key => $item) {
 			foreach ($item as $val) {
 			    if ($val == 0)
@@ -25,9 +78,8 @@ class Solver {
 		}
 	}
 
-	function copyList($dll, $elem) {
+	private function copyList($dll, $elem) {
 		$result = new splDoublyLinkedList();
-
 		foreach ($dll as $key => $value) {
 			$result->unshift($value);
 		}
@@ -36,7 +88,7 @@ class Solver {
 		return $result;
 	}
 
-	function copyL($new, $curr) {
+	private function copyList2($new, $curr) {
 		$curr->rewind();
 		while ($curr->valid()) {
 			$new->push($curr->current());
@@ -45,70 +97,6 @@ class Solver {
 		return $new;
 	}
 
-	function solve() {
-
-		$close = array();
-		$priorityQueue = new Queue();
-		$list = new splDoublyLinkedList();
-		$list->unshift($this->initial);
-		$list->rewind();
-		$priorityQueue->insert($list, 1000000);
-        $complexityInTime = 0;
-		while (true) {
-			array_push($close, $priorityQueue->top()->current()->blocks);
-			$current = $priorityQueue->top();
-			$list = $priorityQueue->extract();
-			if (!$list->current()->amOnPlace()) {
-			    $count = $list->count();
-				while (!$list->isEmpty()) {
-					$this->printBoard($list->pop()->blocks);
-					print "\n";
-				}
-        print "Moves need to win - " . $count . "\n";
-        print "Complexity in time - " . $complexityInTime . "\n";
-				print "Complexity in size - " . ($complexityInTime - $count) . "\n";
-				return ($list);
-			}
-
-			$iterrator = $list->current()->findNeighbors();
-
-			foreach ($iterrator as $key => $value) {
-				if ($value != null) {
-					if (array_search($value->blocks, $close) == false) {
-						$new = new splDoublyLinkedList();
-						$new->unshift($value);
-						$new = $this->copyL($new, $current);
-						$new->rewind();
-						$new->current()->g += 1;
-						$priorityQueue->insert($new, $this->measure($new->current()));
-					    $complexityInTime++;
-					}
-				}
-			}
-		}
-
-		return $priorityQueue->top();
-	}
-
-	function contInPath(splDoublyLinkedList $list, Board $board) {
-		$tmp = $this->copyList($list, null);
-		$tmp->rewind();
-		while ($tmp->valid()) {
-			$tmp->next();
-			if ($tmp->current() == $board) {
-				print "is in path";
-				return true;
-			}
-		}
-		return false;
-	}
-
-	function measure(Board $obj) {
-		$c = $obj->g;
-		$measure = $obj->heuristic;
-
-		return $c + $measure;
-	}
 }
 
 ?>

@@ -11,8 +11,6 @@ class Board {
 	private $zero;
 
 	public function __construct($array, $final) {
-		global $HEURISTIC_FUNC_FLAG;
-
 		$this->zero = 0 ;
 		$this->blocks = $array;
 		$this->heuristic = $this->zero;
@@ -25,24 +23,20 @@ class Board {
 	private function fillBoard($array, $final) {
 		foreach ($array as $key => $value) {
 			foreach ($value as $k => $v) {
-				if ($v != ($this->final[$key][$k])) {
-					$this->heuristic += abs($this->getXY($final, $v, 'x') - $key) + abs($this->getXY($final, $v, 'y') - $k);
-				} if ($v == 0) {
+				if ($v != ($this->final[$key][$k]))
+					$this->heuristic += $this->countABS($final, $v, 'x', $key) + $this->countABS($final, $v, 'y', $k);
+				if ($v == 0) {
 					$this->zeroX = (int)$key;
 					$this->zeroY = (int)$k;
 				}
 			}
-			if ($HEURISTIC_FUNC_FLAG == "-lc")
-								$this->heuristic += $this->linearConflict($value, $key);
+			if ($GLOBALS["HEURISTIC_FUNC_FLAG"] == "-lc")
+				$this->heuristic += $this->linearConflict($value, $key);
 		}
-		if ($HEURISTIC_FUNC_FLAG == "-wp") {
-				$this->heuristic = 0;
-						foreach ($array as $key => $value) {
-								foreach ($value as $k =>$v)
-										if ($v != $final[$key][$k])
-												$this->heuristic++;
-				}
-		}
+	}
+
+	private function countABS($final, $value, $axis, $key) {
+		return abs($this->getXY($final, $value, $axis) - $key);
 	}
 
 	private function linearConflict($row, $numRow) {
@@ -71,15 +65,13 @@ class Board {
 		return 1;
 	}
 
-	private function getXY($final, $c, $what) {
+	private function getXY($final, $value, $axis) {
 		foreach ($final as $key => $item) {
 			foreach ($item as $k => $val) {
-				if ($val == $c) {
-					if ($what == 'x')
-						return $key;
-					if ($what == 'y')
-						return $k;
-				}
+				if ($val == $value && $axis == 'x')
+					return $key;
+				if ($val == $value && $axis == 'y')
+					return $k;
 			}
 		}
 	}

@@ -1,5 +1,7 @@
 <?php
 
+$HEURISTIC_FUNC_FLAG;
+
 ini_set('memory_limit', '-1');
 
 require_once "Board.php";
@@ -149,20 +151,18 @@ function newWay($map_size, $way){
 }
 
 function    error_handler($num = 0) {
-  $msg = "
- 		to execute this program use:
-		php npuzzle.php -md map.txt
-		Heuristic available modes:
-		-lc (linear conflict)
-		-md (manhattan distanse)
-		-b (both of them)";
+  $msg = "To execute this program type in console:
+php npuzzle.php [heuristic mode] [map name]
+Heuristic modes available:
+	-md (manhattan distanse)
+	-lc (linear conflict)";
 
 	if ($num == 1){
-        error_log("\nWrong count of argument");
+        error_log("\nWrong amount of arguments!");
 	} elseif ($num == 2){
-        error_log("\nFile does't exist");
+        error_log("\nFile does't exist!");
 	} elseif ($num == 3){
-        error_log("\nInvalid map");
+        error_log("\nInvalid map!");
     	exit(1);
 	} elseif ($num == 4){
 		error_log("This puzzle is unsolvable!");
@@ -176,15 +176,15 @@ function main($argc, $argv){
 	validate($argc);
 	$data = readFromFile($argv[2]);
 	solveExist($data['map']);
-	$HEURISTIC_FUNC_FLAG = $argv[1];
+	$GLOBALS["HEURISTIC_FUNC_FLAG"] = $argv[1];
 	$newWay = newWay($data["map_size"], findWay($data["map_size"], $data["map"]));
 	// error_log(print_r($newWay ,1));
     $board = new Board($data['map'], $newWay);
-
     $solution = new Solver($board);
-    $test = $solution->solve();
-		// error_log(print_r($test ,1));
+	$solution->solve();
+	return (0);
 }
 
 main($argc, $argv);
+
 ?>

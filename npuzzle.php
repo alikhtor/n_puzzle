@@ -5,7 +5,12 @@ $HEURISTIC_FUNC_FLAG;
 ini_set('memory_limit', '-1');
 
 require_once "Board.php";
+require_once "Neighbours.php";
+require_once "LinearConflict.php";
 require_once "Solver.php";
+require_once "Queue.php";
+require_once "Copy.php";
+require_once "Printer.php";
 
 function readFromFile($filename){
 	$file = file($filename);
@@ -181,7 +186,8 @@ function main($argc, $argv){
 	// error_log(print_r($newWay ,1));
     $board = new Board($data['map'], $newWay);
     $solution = new Solver($board);
-	$solution->solve();
+	$result = $solution->solve();
+	// error_log(print_r($result ,1));
 	return (0);
 }
 

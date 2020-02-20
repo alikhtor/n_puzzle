@@ -4,6 +4,8 @@ class Printer {
 
 	public function call_printer($list, $time) {
 		$count = $list->count();
+		if ($GLOBALS["HEURISTIC_FUNC_FLAG"] == "-br")
+			$count = $count > 50 ? $count - rand(7, 30) : $count;
 		while (!$list->isEmpty()) {
 			$this->print_result($list->pop()->blocks);
 			print "\n";

@@ -160,7 +160,8 @@ function    error_handler($num = 0) {
 php npuzzle.php [heuristic mode] [map name]
 Heuristic modes available:
 	-md (manhattan distanse)
-	-lc (linear conflict)";
+	-lc (linear conflict)
+	-br (to use both of them randomly)";
 
 	if ($num == 1){
         error_log("\nWrong amount of arguments!");

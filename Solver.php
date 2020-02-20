@@ -53,15 +53,8 @@ class Solver extends Copy {
 			array_push($this->close, $this->priorityQueue->top()->current()->blocks);
 			$current = $this->priorityQueue->top();
 			$this->list = $this->priorityQueue->extract();
-			if (!$this->list->current()->amOnPlace()) {
-					$count = $this->list->count();
-				while (!$this->list->isEmpty()) {
-					$this->print_result($this->list->pop()->blocks);
-					print "\n";
-				}
-				print "Moves need to win - " . $count . "\n";
-				print "Complexity in time - " . $this->complexityInTime . "\n";
-				print "Complexity in size - " . ($this->complexityInTime - $count) . "\n";
+			if (!$this->list->current()->onPlace()) {
+				$this->list = $this->call_printer($this->list, $this->complexityInTime);
 				return ($this->list);
 			}
 			$this->findNeighboursToIterate();

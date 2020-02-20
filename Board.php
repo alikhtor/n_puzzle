@@ -65,7 +65,7 @@ class Board extends Neighbours {
 		}
 	}
 
-	public function amOnPlace() {
+	public function onPlace() {
 		return $this->heuristic != 0;
 	}
 

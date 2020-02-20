@@ -2,7 +2,19 @@
     
 class Printer {
 
-    public function print_result($board) {
+	public function call_printer($list, $time) {
+		$count = $list->count();
+		while (!$list->isEmpty()) {
+			$this->print_result($list->pop()->blocks);
+			print "\n";
+		}
+		// print "Time - " . $time . "ms\n";
+		// print "Size - " . ($time - $count) . "\n";
+		print "Moves to solve - " . $count . "\n";
+		return ($list);
+	}
+
+    private function print_result($board) {
 		foreach ($board as $key => $item) {
 			foreach ($item as $val) {
 			    if ($val == 0)
